@@ -2,7 +2,7 @@
 
 This repo includes a snapshot of the Aztec 2 code base that is being used in the upcoming main-net launch of our ZkZkRollup.
 
-We invite all interested parties to read / tinker and use the code. If any bugs are found please report issues responsibly via email to hello@aztecprotocl.com.
+We invite all interested parties to read / tinker and use the code. If any bugs are found please report issues responsibly via email to hello@aztecprotocol.com.
 
 ## Important files
 
