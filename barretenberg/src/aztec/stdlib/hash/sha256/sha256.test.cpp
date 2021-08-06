@@ -137,71 +137,6 @@ TEST(stdlib_sha256, test_55_bytes)
     EXPECT_EQ(proof_result, true);
 }
 
-TEST(stdlib_sha256, test_NIST_vector_one_packed_byte_array)
-{
-    typedef plonk::stdlib::field_t<waffle::TurboComposer> field_pt;
-    typedef plonk::stdlib::packed_byte_array<waffle::TurboComposer> packed_byte_array_pt;
-
-    waffle::TurboComposer composer = waffle::TurboComposer();
-
-    packed_byte_array_pt input(&composer, "abc");
-    packed_byte_array_pt output_bytes = plonk::stdlib::sha256(input);
-    std::vector<field_pt> output = output_bytes.to_unverified_byte_slices(4);
-    EXPECT_EQ(uint256_t(output[0].get_value()).data[0], (uint64_t)0xBA7816BFU);
-    EXPECT_EQ(uint256_t(output[1].get_value()).data[0], (uint64_t)0x8F01CFEAU);
-    EXPECT_EQ(uint256_t(output[2].get_value()).data[0], (uint64_t)0x414140DEU);
-    EXPECT_EQ(uint256_t(output[3].get_value()).data[0], (uint64_t)0x5DAE2223U);
-    EXPECT_EQ(uint256_t(output[4].get_value()).data[0], (uint64_t)0xB00361A3U);
-    EXPECT_EQ(uint256_t(output[5].get_value()).data[0], (uint64_t)0x96177A9CU);
-    EXPECT_EQ(uint256_t(output[6].get_value()).data[0], (uint64_t)0xB410FF61U);
-    EXPECT_EQ(uint256_t(output[7].get_value()).data[0], (uint64_t)0xF20015ADU);
-    printf("composer gates = %zu\n", composer.get_num_gates());
-
-    auto prover = composer.create_prover();
-
-    auto verifier = composer.create_verifier();
-    printf("constructing proof \n");
-    waffle::plonk_proof proof = prover.construct_proof();
-    printf("constructed proof \n");
-
-    bool proof_result = verifier.verify_proof(proof);
-    EXPECT_EQ(proof_result, true);
-}
-
-TEST(stdlib_sha256, test_NIST_vector_one)
-{
-    typedef plonk::stdlib::field_t<waffle::TurboComposer> field_pt;
-    typedef plonk::stdlib::packed_byte_array<waffle::TurboComposer> packed_byte_array_pt;
-
-    waffle::TurboComposer composer = waffle::TurboComposer();
-
-    packed_byte_array_pt input(&composer, "abc");
-
-    packed_byte_array_pt output_bits = plonk::stdlib::sha256(input);
-
-    std::vector<field_pt> output = output_bits.to_unverified_byte_slices(4);
-
-    EXPECT_EQ(output[0].get_value(), fr(0xBA7816BFULL));
-    EXPECT_EQ(output[1].get_value(), fr(0x8F01CFEAULL));
-    EXPECT_EQ(output[2].get_value(), fr(0x414140DEULL));
-    EXPECT_EQ(output[3].get_value(), fr(0x5DAE2223ULL));
-    EXPECT_EQ(output[4].get_value(), fr(0xB00361A3ULL));
-    EXPECT_EQ(output[5].get_value(), fr(0x96177A9CULL));
-    EXPECT_EQ(output[6].get_value(), fr(0xB410FF61ULL));
-    EXPECT_EQ(output[7].get_value(), fr(0xF20015ADULL));
-    printf("composer gates = %zu\n", composer.get_num_gates());
-
-    auto prover = composer.create_prover();
-
-    auto verifier = composer.create_verifier();
-    printf("constructing proof \n");
-    waffle::plonk_proof proof = prover.construct_proof();
-    printf("constructed proof \n");
-
-    bool proof_result = verifier.verify_proof(proof);
-    EXPECT_EQ(proof_result, true);
-}
-
 TEST(stdlib_sha256, test_NIST_vector_two)
 {
     Composer composer = Composer();
@@ -288,50 +223,6 @@ TEST(stdlib_sha256, test_NIST_vector_four)
 
     printf("composer gates = %zu\n", composer.get_num_gates());
     Verifier verifier = composer.create_verifier();
-
-    waffle::plonk_proof proof = prover.construct_proof();
-
-    bool proof_result = verifier.verify_proof(proof);
-    EXPECT_EQ(proof_result, true);
-}
-
-HEAVY_TEST(stdlib_sha256, test_NIST_vector_five)
-{
-    typedef plonk::stdlib::field_t<waffle::TurboComposer> field_pt;
-    typedef plonk::stdlib::packed_byte_array<waffle::TurboComposer> packed_byte_array_pt;
-
-    waffle::TurboComposer composer = waffle::TurboComposer();
-
-    packed_byte_array_pt input(
-        &composer,
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        "AAAAAAAAAA");
-
-    packed_byte_array_pt output_bits = plonk::stdlib::sha256<waffle::TurboComposer>(input);
-
-    std::vector<field_pt> output = output_bits.to_unverified_byte_slices(4);
-
-    EXPECT_EQ(output[0].get_value(), 0xc2e68682ULL);
-    EXPECT_EQ(output[1].get_value(), 0x3489ced2ULL);
-    EXPECT_EQ(output[2].get_value(), 0x017f6059ULL);
-    EXPECT_EQ(output[3].get_value(), 0xb8b23931ULL);
-    EXPECT_EQ(output[4].get_value(), 0x8b6364f6ULL);
-    EXPECT_EQ(output[5].get_value(), 0xdcd835d0ULL);
-    EXPECT_EQ(output[6].get_value(), 0xa519105aULL);
-    EXPECT_EQ(output[7].get_value(), 0x1eadd6e4ULL);
-
-    auto prover = composer.create_prover();
-
-    printf("composer gates = %zu\n", composer.get_num_gates());
-    auto verifier = composer.create_verifier();
 
     waffle::plonk_proof proof = prover.construct_proof();
 

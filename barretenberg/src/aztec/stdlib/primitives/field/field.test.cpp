@@ -1,6 +1,5 @@
 #include "../bool/bool.hpp"
 #include "field.hpp"
-#include "../witness/witness.hpp"
 #include <gtest/gtest.h>
 #include <plonk/composer/standard_composer.hpp>
 #include <plonk/composer/turbo_composer.hpp>

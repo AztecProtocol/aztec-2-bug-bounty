@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+# Clean.
+rm -rf ./build
+rm -rf ./build-wasm
+
 # Install formatting git hook.
 echo "cd ./barretenberg && ./format.sh staged" > ../.git/hooks/pre-commit
 chmod +x ../.git/hooks/pre-commit
@@ -19,7 +23,7 @@ cmake --build . --parallel
 cd ..
 
 # Install the webassembly toolchain and patch runtime.
-if [ ! -d ./src/wasi-sdk-8.0 ]; then
+if [ ! -d ./src/wasi-sdk-12.0 ]; then
   cd ./src
   if [[ "$OSTYPE" == "darwin"* ]]; then
       OS=macos
@@ -29,8 +33,7 @@ if [ ! -d ./src/wasi-sdk-8.0 ]; then
       echo "Unknown OS: $OSTYPE"
       exit 1
   fi
-  curl -s -L https://github.com/CraneStation/wasi-sdk/releases/download/wasi-sdk-8/wasi-sdk-8.0-$OS.tar.gz | tar zxfv -
-  sed -e $'213i\\\n#include "../../../../wasi/stdlib-hook.h"' -i.old ./wasi-sdk-8.0/share/wasi-sysroot/include/stdlib.h
+  curl -s -L https://github.com/CraneStation/wasi-sdk/releases/download/wasi-sdk-12/wasi-sdk-12.0-$OS.tar.gz | tar zxfv -
   cd ..
 fi
 

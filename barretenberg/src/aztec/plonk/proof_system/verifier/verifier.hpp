@@ -33,11 +33,13 @@ template <typename program_settings> class VerifierBase {
 extern template class VerifierBase<unrolled_standard_verifier_settings>;
 extern template class VerifierBase<unrolled_turbo_verifier_settings>;
 extern template class VerifierBase<standard_verifier_settings>;
+extern template class VerifierBase<mimc_verifier_settings>;
 extern template class VerifierBase<turbo_verifier_settings>;
 
 typedef VerifierBase<unrolled_standard_verifier_settings> UnrolledVerifier;
 typedef VerifierBase<unrolled_turbo_verifier_settings> UnrolledTurboVerifier;
 typedef VerifierBase<standard_verifier_settings> Verifier;
+typedef VerifierBase<mimc_verifier_settings> MiMCVerifier;
 typedef VerifierBase<turbo_verifier_settings> TurboVerifier;
 
 } // namespace waffle

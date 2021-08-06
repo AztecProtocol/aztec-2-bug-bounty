@@ -25,6 +25,14 @@ void ComposerBase::assert_equal(const uint32_t a_variable_idx, const uint32_t b_
     auto a_start_idx = get_first_variable_in_class(a_variable_idx);
     next_var_index[b_real_idx] = a_start_idx;
     prev_var_index[a_start_idx] = b_real_idx;
+    bool no_tag_clash = (variable_tags[a_real_idx] == DUMMY_TAG || variable_tags[b_real_idx] == DUMMY_TAG ||
+                         variable_tags[a_real_idx] == variable_tags[b_real_idx]);
+    if (!no_tag_clash && !failed) {
+        failed = true;
+        err = msg;
+    }
+    if (variable_tags[a_real_idx] == DUMMY_TAG)
+        variable_tags[a_real_idx] = variable_tags[b_real_idx];
 }
 
 template <size_t program_width> void ComposerBase::compute_wire_copy_cycles()
@@ -60,7 +68,7 @@ template <size_t program_width> void ComposerBase::compute_wire_copy_cycles()
     }
 }
 
-template <size_t program_width, bool> void ComposerBase::compute_sigma_permutations(proving_key* key)
+template <size_t program_width, bool with_tags> void ComposerBase::compute_sigma_permutations(proving_key* key)
 {
     compute_wire_copy_cycles<program_width>();
     std::array<std::vector<permutation_subgroup_element>, program_width> sigma_mappings;
@@ -70,10 +78,14 @@ template <size_t program_width, bool> void ComposerBase::compute_sigma_permutati
 
     for (size_t i = 0; i < program_width; ++i) {
         sigma_mappings[i].reserve(key->n);
+        if (with_tags)
+            id_mappings[i].reserve(key->n);
     }
     for (size_t i = 0; i < program_width; ++i) {
         for (size_t j = 0; j < key->n; ++j) {
             sigma_mappings[i].emplace_back(permutation_subgroup_element{ (uint32_t)j, (uint8_t)i, false, false });
+            if (with_tags)
+                id_mappings[i].emplace_back(permutation_subgroup_element{ (uint32_t)j, (uint8_t)i, false, false });
         }
     }
     for (size_t i = 0; i < wire_copy_cycles.size(); ++i) {
@@ -88,6 +100,21 @@ template <size_t program_width, bool> void ComposerBase::compute_sigma_permutati
             const uint32_t next_column = static_cast<uint32_t>(next_cycle_node.wire_type) >> 30U;
 
             sigma_mappings[current_column][current_row] = { next_row, (uint8_t)next_column, false, false };
+
+            bool first_node, last_node;
+            if (with_tags) {
+
+                first_node = j == 0;
+                last_node = next_cycle_node_index == 0;
+                if (first_node) {
+                    id_mappings[current_column][current_row].is_tag = true;
+                    id_mappings[current_column][current_row].subgroup_index = (variable_tags[i]);
+                }
+                if (last_node) {
+                    sigma_mappings[current_column][current_row].is_tag = true;
+                    sigma_mappings[current_column][current_row].subgroup_index = tau.at(variable_tags[i]);
+                }
+            }
         }
     }
     // This corresponds in the paper to modifying sigma to sigma' with the zeta_i values; this enforces public input
@@ -96,6 +123,9 @@ template <size_t program_width, bool> void ComposerBase::compute_sigma_permutati
         sigma_mappings[0][i].subgroup_index = static_cast<uint32_t>(i);
         sigma_mappings[0][i].column_index = 0;
         sigma_mappings[0][i].is_public_input = true;
+        if (sigma_mappings[0][i].is_tag) {
+            std::cout << "MAPPING IS BOTH A TAG AND A PUBLIC INPUT" << std::endl;
+        }
     }
     for (size_t i = 0; i < program_width; ++i) {
         std::string index = std::to_string(i + 1);
@@ -111,6 +141,19 @@ template <size_t program_width, bool> void ComposerBase::compute_sigma_permutati
         sigma_fft.coset_fft(key->large_domain);
         key->permutation_selectors.insert({ "sigma_" + index, std::move(sigma_polynomial) });
         key->permutation_selector_ffts.insert({ "sigma_" + index + "_fft", std::move(sigma_fft) });
+        if (with_tags) {
+            barretenberg::polynomial id_polynomial(key->n);
+            compute_permutation_lagrange_base_single<standard_settings>(
+                id_polynomial, id_mappings[i], key->small_domain);
+
+            barretenberg::polynomial id_polynomial_lagrange_base(id_polynomial);
+            key->permutation_selectors_lagrange_base.insert({ "id_" + index, std::move(id_polynomial_lagrange_base) });
+            id_polynomial.ifft(key->small_domain);
+            barretenberg::polynomial id_fft(id_polynomial, key->large_domain.size);
+            id_fft.coset_fft(key->large_domain);
+            key->permutation_selectors.insert({ "id_" + index, std::move(id_polynomial) });
+            key->permutation_selector_ffts.insert({ "id_" + index + "_fft", std::move(id_fft) });
+        }
     }
 }
 

@@ -6,6 +6,7 @@
 #include <plonk/proof_system/types/prover_settings.hpp>
 
 namespace waffle {
+static constexpr uint32_t DUMMY_TAG = 0;
 
 struct proving_key;
 struct verification_key;
@@ -90,6 +91,17 @@ struct accumulator_triple {
     std::vector<uint32_t> out;
 };
 
+struct ecc_add_gate {
+    uint32_t x1;
+    uint32_t y1;
+    uint32_t x2;
+    uint32_t y2;
+    uint32_t x3;
+    uint32_t y3;
+    barretenberg::fr endomorphism_coefficient;
+    barretenberg::fr sign_coefficient;
+};
+
 enum ComposerType {
     STANDARD,
     TURBO,
@@ -97,13 +109,14 @@ enum ComposerType {
 
 class ComposerBase {
   public:
-    static constexpr uint32_t IS_CONSTANT = UINT32_MAX;
     struct SelectorProperties {
         std::string name;
         bool use_mid_for_selectorfft = false;           // use middomain instead of large for selectorfft
         bool requires_lagrange_base_polynomial = false; // does the prover need the raw lagrange-base selector values?
     };
 
+    static constexpr uint32_t IS_CONSTANT =
+        UINT32_MAX; // indicates whether a witness index actually contains a constant
     static constexpr uint32_t REAL_VARIABLE = UINT32_MAX - 1;
     static constexpr uint32_t FIRST_VARIABLE_IN_CLASS = UINT32_MAX - 2;
     static constexpr size_t NUM_RESERVED_GATES = 4; // this must be >= num_roots_cut_out_of_vanishing_polynomial
@@ -251,6 +264,7 @@ class ComposerBase {
         real_variable_index.emplace_back(index);
         next_var_index.emplace_back(REAL_VARIABLE);
         prev_var_index.emplace_back(FIRST_VARIABLE_IN_CLASS);
+        variable_tags.emplace_back(DUMMY_TAG);
         wire_copy_cycles.push_back(std::vector<cycle_node>());
         return index;
     }
@@ -262,6 +276,7 @@ class ComposerBase {
         real_variable_index.emplace_back(index);
         next_var_index.emplace_back(REAL_VARIABLE);
         prev_var_index.emplace_back(FIRST_VARIABLE_IN_CLASS);
+        variable_tags.emplace_back(DUMMY_TAG);
         wire_copy_cycles.push_back(std::vector<cycle_node>());
         public_inputs.emplace_back(index);
         return index;
@@ -281,7 +296,7 @@ class ComposerBase {
     virtual void assert_equal(const uint32_t a_idx, const uint32_t b_idx, std::string const& msg = "assert_equal");
 
     template <size_t program_width> void compute_wire_copy_cycles();
-    template <size_t program_width, bool = false> void compute_sigma_permutations(proving_key* key);
+    template <size_t program_width, bool with_tags = false> void compute_sigma_permutations(proving_key* key);
 
     void add_selector(polynomial& small, const std::string& tag, bool preserve_lagrange_base = false)
     {
@@ -319,6 +334,9 @@ class ComposerBase {
     std::vector<uint32_t>
         prev_var_index; // index of  previous variable in equivalence class (=FIRST if you're in a cycle alone)
     std::vector<uint32_t> real_variable_index; // indices of corresponding real variables
+    std::vector<uint32_t> variable_tags;
+    uint32_t current_tag = DUMMY_TAG;
+    std::map<uint32_t, uint32_t> tau; // the permutation on variable tags;
     std::vector<std::vector<cycle_node>> wire_copy_cycles;
 
     std::shared_ptr<proving_key> circuit_proving_key;

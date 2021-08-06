@@ -142,4 +142,11 @@ TEST(test_public_inputs, compute_delta)
 
     EXPECT_EQ((modified_result == target_delta), true);
 }
+// T0 = witness + gamma;
+// T1 = work_root * beta;
+// T2 = T1 * Field::coset_generator(0);
+// T3 = T1 * Field::external_coset_generator();
+// T2 += T0;
+// T3 += T0;
+
 } // namespace

@@ -63,7 +63,6 @@ extern template signature_bits<waffle::TurboComposer> convert_signature<waffle::
 
 extern template bit_array<waffle::TurboComposer> convert_message<waffle::TurboComposer>(waffle::TurboComposer*,
                                                                                         const std::string&);
-
 } // namespace schnorr
 } // namespace stdlib
 } // namespace plonk

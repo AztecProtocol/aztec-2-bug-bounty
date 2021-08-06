@@ -61,6 +61,7 @@ inline void compute_permutation_lagrange_base_single(barretenberg::polynomial& o
     // Step 1: mask the high bits and get the permutation index
     size_t raw_idx = permutation[i].subgroup_index;
     bool is_public_input = permutation[i].is_public_input;
+    bool is_tag = permutation[i].is_tag;
 
     // Step 2: is `raw_idx` >= (n / 2)? if so, we will need to index `-roots[raw_idx - subgroup_size / 2]` instead
     // of `roots[raw_idx]`
@@ -85,6 +86,8 @@ inline void compute_permutation_lagrange_base_single(barretenberg::polynomial& o
 
     if (is_public_input) {
         output[i] *= barretenberg::fr::external_coset_generator();
+    } else if (is_tag) {
+        output[i] *= barretenberg::fr::tag_coset_generator();
     } else {
         {
             // isolate the highest 2 bits of `permutation[i]` and shunt them down into the 2 least significant bits

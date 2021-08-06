@@ -82,5 +82,10 @@ template class uint<waffle::StandardComposer, uint8_t>;
 template class uint<waffle::StandardComposer, uint16_t>;
 template class uint<waffle::StandardComposer, uint32_t>;
 template class uint<waffle::StandardComposer, uint64_t>;
+
+template class uint<waffle::MiMCComposer, uint8_t>;
+template class uint<waffle::MiMCComposer, uint16_t>;
+template class uint<waffle::MiMCComposer, uint32_t>;
+template class uint<waffle::MiMCComposer, uint64_t>;
 } // namespace stdlib
 } // namespace plonk

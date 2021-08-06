@@ -34,3 +34,11 @@ class StandardTranscript : public Transcript {
 };
 
 } // namespace transcript
+  // template <Composer> class RecursiveTranscript : public TranscriptBase {
+  //   public:
+  //     void add_field_element(const std::string& element_name.const plonk::stdlib::field_t<Composer>& element);
+
+//     plonk::stdlib::field_t<Composer> get_field_element(const std::string& element_name) const;
+
+//     plonk::stdlib::field_t<Composer> get_challenge_field_element(const std::string& challenge_name) const;
+// }

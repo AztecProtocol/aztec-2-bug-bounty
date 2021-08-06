@@ -39,7 +39,14 @@ template <typename Composer> class Transcript {
         : context(in_context)
         , transcript_base(input_transcript, input_manifest, transcript::HashType::PedersenBlake2s, 16)
         , current_challenge(in_context)
-    {}
+    /*, transcript_bytes(in_context) */
+    {
+        // for (size_t i = 0; i < input_transcript.size(); ++i)
+        // {
+        //     field_t<Composer> data(witness_pt<Composer>(context, input_transcript[i]));
+        //     transcript_bytes.write(byte_array<Composer>(data));
+        // }
+    }
 
     transcript::Manifest get_manifest() const { return transcript_base.get_manifest(); }
 
@@ -95,7 +102,8 @@ template <typename Composer> class Transcript {
         field_keys.push_back(element_name);
         field_values.push_back(element);
     }
-
+    // 0x28b96cad7dce47b8e727159ce2adbdd119a4435d6edcba6361209301bd53bd0f
+    // 0xb96cad7dce47b8e727159ce2adbdd10019a4435d6edcba6361209301bd53bd0f
     void add_group_element(const std::string& element_name, const group_pt& element)
     {
         uint256_t x = element.x.get_value().lo;

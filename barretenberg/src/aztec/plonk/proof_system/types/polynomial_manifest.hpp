@@ -106,6 +106,23 @@ static constexpr PolynomialDescriptor standard_polynomial_manifest[12]{
     PolynomialDescriptor("SIGMA_3", "sigma_3", true, false, PERMUTATION, SIGMA_3),  //
 };
 
+static constexpr PolynomialDescriptor mimc_polynomial_manifest[14]{
+    PolynomialDescriptor("W_1", "w_1", false, false, WITNESS, W_1),                                               //
+    PolynomialDescriptor("W_2", "w_2", false, false, WITNESS, W_2),                                               //
+    PolynomialDescriptor("W_3", "w_3", false, true, WITNESS, W_3),                                                //
+    PolynomialDescriptor("Z", "z", true, true, WITNESS, Z),                                                       //
+    PolynomialDescriptor("Q_1", "q_1", true, false, SELECTOR, Q_1),                                               //
+    PolynomialDescriptor("Q_2", "q_2", true, false, SELECTOR, Q_2),                                               //
+    PolynomialDescriptor("Q_3", "q_3", true, false, SELECTOR, Q_3),                                               //
+    PolynomialDescriptor("Q_M", "q_m", true, false, SELECTOR, Q_M),                                               //
+    PolynomialDescriptor("Q_C", "q_c", true, false, SELECTOR, Q_C),                                               //
+    PolynomialDescriptor("Q_MIMC_COEFFICIENT", "q_mimc_coefficient", false, false, SELECTOR, Q_MIMC_COEFFICIENT), //
+    PolynomialDescriptor("Q_MIMC_SELECTOR", "q_mimc_selector", true, false, SELECTOR, Q_MIMC_SELECTOR),           //
+    PolynomialDescriptor("SIGMA_1", "sigma_1", false, false, PERMUTATION, SIGMA_1),                               //
+    PolynomialDescriptor("SIGMA_2", "sigma_2", false, false, PERMUTATION, SIGMA_2),                               //
+    PolynomialDescriptor("SIGMA_3", "sigma_3", true, false, PERMUTATION, SIGMA_3),                                //
+};
+
 static constexpr PolynomialDescriptor turbo_polynomial_manifest[20]{
     PolynomialDescriptor("W_1", "w_1", false, true, WITNESS, W_1),                                           //
     PolynomialDescriptor("W_2", "w_2", false, true, WITNESS, W_2),                                           //
@@ -128,4 +145,5 @@ static constexpr PolynomialDescriptor turbo_polynomial_manifest[20]{
     PolynomialDescriptor("SIGMA_3", "sigma_3", false, false, PERMUTATION, SIGMA_3),                          //
     PolynomialDescriptor("SIGMA_4", "sigma_4", true, false, PERMUTATION, SIGMA_4),                           //
 };
+
 } // namespace waffle

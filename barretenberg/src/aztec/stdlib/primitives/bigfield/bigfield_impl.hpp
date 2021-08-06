@@ -71,6 +71,7 @@ bigfield<C, T>::bigfield(const field_t<C>& low_bits, const field_t<C>& high_bits
     // We create the high limb values similar to the low limb ones above
     const uint64_t num_high_limb_bits = NUM_LIMB_BITS + num_last_limb_bits;
     if (high_bits.witness_index != IS_CONSTANT) {
+
         std::vector<uint32_t> high_accumulator;
         high_accumulator =
             context->create_range_constraint(high_bits.witness_index, static_cast<size_t>(num_high_limb_bits));
@@ -950,7 +951,6 @@ void bigfield<C, T>::evaluate_multiply_add(const bigfield& left,
     const uint64_t carry_hi_msb = max_hi_bits - (2 * NUM_LIMB_BITS);
 
     const barretenberg::fr carry_lo_shift(uint256_t(uint256_t(1) << carry_lo_msb));
-    // std::cout <<"lowmsb:" << carry_lo_msb << " highmsb:" <<carry_hi_msb <<std::endl;
     field_t carry_combined = carry_lo + (carry_hi * carry_lo_shift);
     carry_combined = carry_combined.normalize();
     const auto accumulators =
@@ -1215,6 +1215,10 @@ void bigfield<C, T>::evaluate_square_add(const bigfield& left,
         ctx->create_range_constraint(carry_combined.witness_index, static_cast<size_t>(carry_lo_msb + carry_hi_msb));
     carry_hi = carry_hi.normalize();
     ctx->assert_equal(carry_hi.witness_index, accumulators[static_cast<size_t>((carry_hi_msb / 2) - 1)]);
+
+    // const auto accumulators =
+    //     ctx->create_range_constraint(carry_combined.witness_index, static_cast<size_t>(carry_lo_msb + carry_hi_msb));
+    // ctx->assert_equal(carry_hi.witness_index, accumulators[static_cast<size_t>((carry_hi_msb / 2) - 1)]);
 }
 
 } // namespace stdlib
