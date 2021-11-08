@@ -13,3 +13,6 @@ We invite all interested parties to read / tinker and use the code. If any bugs 
 A draft protocol specification can be found below, and will be updated to be more detailed over the coming days.
 
 https://hackmd.io/@aztec-network/ByzgNxBfd
+
+
+** Some bugs have already been fixed. See https://github.com/AztecProtocol/barretenberg for description of these fixes and updated code **
