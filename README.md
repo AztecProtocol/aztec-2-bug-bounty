@@ -1,5 +1,6 @@
 **THIS IS AN OLD BOUNTY PROGRAM, see the updated code and program here:**  
 https://github.com/AztecProtocol/aztec-connect
+
 https://immunefi.com/bounty/aztecnetwork/
 
 # Aztec 2 Bug Bounty
